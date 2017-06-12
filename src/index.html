@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cross domain</title>
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+
+    <style media="screen">
+        iframe {
+            position: absolute;
+            top: 0;
+            z-index: -1;
+            width: 1440px;
+            height: 800px;
+            clip: rect(0px,60px,200px,0px);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="1440" height="800"></canvas>
+
+    <script src="crossdomain.js" charset="utf-8"></script>
+</body>
+</html>

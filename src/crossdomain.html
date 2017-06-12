@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html>
+    <head></head>
+    <body>
+        <script>
+            var query = {
+                width: 1440,
+                height: 800
+            };
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var video = document.createElement('video');
+            var origin = '';
+            var FRAME_ID = '';
+
+            location.search.substr(1).split('&').forEach(function (pair) {
+                var data = pair.split('=');
+                video[data[0]] = query[data[0]] = decodeURIComponent(data[1]);
+            });
+
+            video.addEventListener('play', function () {
+                callback();
+            });
+
+            video.addEventListener('ended', function () {
+                post({ method: 'ended'});
+            });
+
+            canvas.width = query.width;
+            canvas.height = query.height;
+            canvas.style.width = query.width + 'px';
+            canvas.style.height = query.height + 'px';
+
+            function callback () {
+                if (video.paused || video.ended) {
+                    return;
+                }
+
+                var width = query.width;
+                var height =query.height;
+
+                ctx.drawImage(video, 0, 0, width, height);
+                var frame = ctx.getImageData(0, 0, width, height);
+                var l = frame.data.length / 4;
+
+                for (var i = 0; i < l; i++) {
+                    frame.data[i * 4] = frame.data[i * 4] + 21;
+                    frame.data[i * 4 + 1] = frame.data[i * 4 + 1] + 20;
+                    frame.data[i * 4 + 2] = frame.data[i * 4 + 2] + 19;
+                    // frame.data[i * 4 + 3] = frame.data[i * 4 + 3];
+                }
+
+                post({ method: 'frame', data: frame });
+
+                setTimeout(function () {
+                    callback();
+                }, 1000 / 60);
+            }
+
+            function post (data) {
+                data.id = FRAME_ID;
+                window.parent.postMessage(data, origin);
+            }
+
+            // event.data 鏍煎紡
+            // method
+            // data
+            window.addEventListener("message", function (event) {
+                // For Chrome, the origin property is in the event.originalEvent object
+                origin = event.origin || event.originalEvent.origin;
+                FRAME_ID = event.data.id;
+
+                switch (event.data.method) {
+                    case 'play':
+                        console.log('play');
+                        video.play();
+                        break;
+                    case 'pause':
+                        video.pause();
+                        break;
+                }
+
+            }, false);
+        </script>
+    </body>
+</html>
